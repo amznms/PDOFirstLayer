@@ -1,18 +1,26 @@
 <?php
 
 /**
- * Description of Validation
+ * Essential PDO Class
  *
- * @author Aldson Diego
+ * @author Aldson Diego - aldsondiego@gmail.com
+ * 
  */
 class MyPDO {
 
-    //connect to mysql
-    private $db_host = 'localhost';
-    private $db_name = 'caketest';
-    private $db_user = 'root';
-    private $db_pass = '';
+    /*connect to mysql
+    private $db_host = 'YOUR HOST NAME HERE';
+    private $db_name = 'YOUR DATABASE NAME HERE';
+    private $db_user = 'YOUR DATABASE USER HERE';
+    private $db_pass = 'YOUR PASSWORD USER HERE';
+    */
 
+	//change these variables for your database
+	private $db_host = 'localhost';
+	private $db_name = 'blog';
+	private $db_user = 'root';
+	private $db_pass = '';
+	
     //useful
     private $conn;
     private $query;
@@ -32,7 +40,7 @@ class MyPDO {
     }
 
     //Execute Query
-    public function query($sql){
+    private function query($sql){
         try{
             $db = $this->conn->prepare($sql);
             $db->execute();
@@ -42,6 +50,13 @@ class MyPDO {
         $this->query = $db;
         return true;
     }
+    
+    public function insert($sql){
+    	if($this->query($sql)){
+    		return $this->conn->lastInsertId();
+    	}
+    	return null;
+    }
 
     //Get Array List
     public function getAll($sql){
@@ -49,20 +64,25 @@ class MyPDO {
         if($this->query($sql)){
             $dados = array();
             try{
-                $dados = $this->query->fetchAll(PDO::FETCH_ASSOC);
+                return $this->query->fetchAll(PDO::FETCH_ASSOC);
             }catch(PDOException $e){
-                $dados = array();
+                return null;
                 //$e->getMessage();
             }
-            return $dados;
         }
         return null;
     }
 
     //Get Row
     public function getFirst($sql){
-        $this->query($sql);
-        return $this->query->fetch(PDO::FETCH_ASSOC);
+        if($this->query($sql)){
+        	try{
+        		return $this->query->fetch(PDO::FETCH_ASSOC);
+        	}catch(PDOException $e){
+        		return null;
+        	}
+        }
+        return null;
     }
 
     // Close Connection
